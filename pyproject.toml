@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "deep-metric-learning"
+version = "0.1.0"
+description = "a toy project applying canonical deep metric learning techniques on public dataset."
+authors = ["Ming Li <ming.george.li@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
