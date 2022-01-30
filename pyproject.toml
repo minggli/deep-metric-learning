@@ -178,6 +178,5 @@ disable='''print-statement,
         missing-module-docstring,
         missing-class-docstring,
         missing-function-docstring,
-        W,
         R0201,
 '''
