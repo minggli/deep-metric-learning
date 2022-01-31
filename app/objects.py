@@ -16,7 +16,12 @@ class BaseTransform(T.Compose):
 class ImageTransform(BaseTransform):
     def __init__(self, transforms):
         _ = transforms
-        super().__init__([T.ToTensor(), T.Lambda(assign_device)])
+        super().__init__(
+            [
+                T.ToTensor(),
+                T.Lambda(assign_device),
+            ]
+        )
 
 
 class TextTransform(BaseTransform):
