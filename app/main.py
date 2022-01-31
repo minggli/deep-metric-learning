@@ -7,7 +7,7 @@ from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test, train
 from app.models import SiameseNetwork, resnet18
 from app.objects import ImageTransform
-from app.utils import get_project_root
+from app.utils import get_project_root, get_torch_device
 
 PROJ_ROOT = get_project_root()
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=True, num_workers=4)
 
     n_class = len(ds_train.classes)
-    model = SiameseNetwork(resnet18, n_class=n_class)
+    model = SiameseNetwork(resnet18, n_class=n_class).to(get_torch_device())
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     loss = nn.CrossEntropyLoss()
 
