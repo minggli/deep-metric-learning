@@ -19,10 +19,10 @@ class SiameseNetwork(nn.Module):
         else:
             self.n_class = 1
 
-        self.layer_1 = nn.LazyConv2d(3, kernel_size=7, stride=2, padding=3, bias=False)
+        self.layer_1 = nn.Conv2d(1, 3, kernel_size=7, stride=2, padding=3, bias=False)
         self.pre_trained_model = pre_trained_model
         self.layer_2 = nn.GELU()
-        self.logits = nn.LazyLinear(self.n_class)
+        self.logits = nn.Linear(1000, self.n_class)
 
     def forward(self, x):
         x = self.layer_1(x)

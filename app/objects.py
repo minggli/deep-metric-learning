@@ -26,3 +26,14 @@ class ImageTransform(BaseTransform):
 
 class TextTransform(BaseTransform):
     pass
+
+
+class TargetTransform(BaseTransform):
+    def __init__(self, transforms):
+        _ = transforms
+        super().__init__(
+            [
+                T.Lambda(torch.tensor),
+                T.Lambda(assign_device),
+            ]
+        )
