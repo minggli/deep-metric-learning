@@ -8,11 +8,13 @@ def train(dataloader, model, loss_fn, optimizer):
         logits = model(x_train)
         loss = loss_fn(logits, y_train)
         optimizer.zero_grad()
-        loss.backward()
+        # DataParallel
+        joined_loss = loss.mean()
+        joined_loss.backward()
         optimizer.step()
 
         if batch_index % 100 == 0:
-            loss, current = loss.item(), batch_index * len(x_train)
+            loss, current = joined_loss.item(), batch_index * len(x_train)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
@@ -24,7 +26,9 @@ def test(dataloader, model, loss_fn):
     with torch.no_grad():
         for x_test, y_test in dataloader:
             logits = model(x_test)
-            test_loss += loss_fn(logits, y_test).item()
+            loss = loss_fn(logits, y_test)
+            joined_loss = loss.mean()
+            test_loss += joined_loss.item()
             correct += (logits.argmax(1) == y_test).type(torch.float32).sum().item()
     test_loss /= num_batches
     correct /= size

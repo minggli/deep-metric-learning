@@ -1,40 +1,50 @@
 import torch
 from torch import nn
 from torchvision import models
+import torch.nn.functional as F
 
 resnet18 = models.resnet18(pretrained=False)
 
 class InfoNCELoss(nn.CrossEntropyLoss):
-    # Oord et al 2019
-    # nn.CrossEntroyLoss includes log-softmax operation before cross entropy
+    # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
 
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, reduction='none', **kwargs)
 
-        self.projection_W = nn.Parameter(torch.zeros(64, 64), requires_grad=True)
-        torch.nn.init.xavier_normal_(self.projection_W)
-    
-    def forward(self, x, y):
-        # project learned embeddings onto unit sphere
-        norm_x = nn.functional.normalize(x)
-        # original paper uses log-bilinear as f
-        score = norm_x @ self.projection_W @ norm_x.T
-        class_indice = torch.arange(norm_x.shape[0]).to(norm_x.device)
+    def forward(self, input_x, target):
+        if target.dim() < 2:
+            target.unsqueeze_(1)
+        
+        label_mask = torch.eq(target, target.T).type(torch.float32)
+        positive_examples = label_mask.sum(dim=1)
 
-        return super().forward(score, class_indice)
+        # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
+        loss = super(InfoNCELoss, self).forward(input_x, label_mask)
+        loss /= positive_examples
+
+        return loss.mean()
 
 
-class SiameseNetwork(nn.Module):
+class Network(nn.Module):
     def __init__(self, cnn_block: nn.Module, n_class: int = None) -> None:
         super().__init__()
 
         self.layer_1 = nn.Conv2d(1, 3, kernel_size=7, stride=2, padding=3, bias=False)
         self.cnn_block = cnn_block
         self.layer_2 = nn.GELU()
-        self.output_layer = nn.Linear(1000, 64)
+        self.layer_3 = nn.Linear(1000, 64)
+        self.proj_W = nn.Parameter(torch.zeros(64, 64))
+        torch.nn.init.xavier_normal_(self.proj_W)
 
     def forward(self, x):
         x = self.layer_1(x)
         x = self.cnn_block(x)
         x = self.layer_2(x)
-        return self.output_layer(x)
+        x = self.layer_3(x)
+
+        # project learned embeddings onto unit sphere
+        norm_x = nn.functional.normalize(x)
+        # Oord et al 2019 uses log-bilinear as function f that approximates Mutual Information
+        bilinear = norm_x @ self.proj_W @ norm_x.T
+
+        return bilinear
