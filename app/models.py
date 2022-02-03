@@ -2,12 +2,14 @@ import torch
 from torch import nn
 from torchvision import models
 import torch.nn.functional as F
+from torch.nn.modules.loss import _WeightedLoss
+
 
 resnet18 = models.resnet18(pretrained=False)
 
+
 class InfoNCELoss(nn.CrossEntropyLoss):
     # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, reduction='none', **kwargs)
 
@@ -22,6 +24,24 @@ class InfoNCELoss(nn.CrossEntropyLoss):
         # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
         loss = super(InfoNCELoss, self).forward(input_x, label_mask)
         loss /= positive_examples
+
+        return loss.mean()
+
+
+class SoftNearestNeighborsLoss(_WeightedLoss):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def forward(self, input_x, target):
+        if target.dim() < 2:
+            target.unsqueeze_(1)
+
+        label_mask = torch.eq(target, target.T).type(torch.float32)
+        loss = torch.log(
+            (F.softmax(input_x, dim=1) * label_mask).sum(dim=1) \
+            + torch.finfo(torch.float32).eps
+        )
+        loss *= -1
 
         return loss.mean()
 

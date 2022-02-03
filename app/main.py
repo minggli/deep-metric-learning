@@ -8,9 +8,10 @@ from time import time
 
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test, train
-from app.models import Network, resnet18, InfoNCELoss
+from app.models import Network, resnet18, InfoNCELoss, SoftNearestNeighborsLoss
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
+
 
 PROJ_ROOT = get_project_root()
 with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     model = nn.DataParallel(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    loss = InfoNCELoss().to(get_torch_device())
+    loss = SoftNearestNeighborsLoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
 
     timestamp = int(time())
