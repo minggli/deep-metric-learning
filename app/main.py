@@ -3,6 +3,9 @@ import yaml
 from torch import nn
 from torch.utils.data import DataLoader
 
+from smart_open import open
+from time import time
+
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test, train
 from app.models import Network, resnet18, InfoNCELoss
@@ -27,6 +30,12 @@ if __name__ == "__main__":
     loss = InfoNCELoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
 
+    timestamp = int(time())
+
     for epoch in range(10):
         train(train_batch_iter, model, loss, optimizer)
         test(test_batch_iter, model, loss)
+
+    with open(f"gs://saved_models_minggli/model_{timestamp}.pt", "wb") as f:
+        torch.save(model, f)
+

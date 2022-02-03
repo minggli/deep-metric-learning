@@ -15,6 +15,7 @@ black = "^21.12b0"
 pylint = "^2.12.2"
 torchvision = "^0.11.3"
 PyYAML = "^6.0"
+smart-open = {extras = ["gcs"], version = "^5.2.1"}
 
 
 [tool.poetry.dev-dependencies]
