@@ -15,7 +15,8 @@ class InfoNCELoss(nn.CrossEntropyLoss):
         if target.dim() < 2:
             target.unsqueeze_(1)
         
-        label_mask = torch.eq(target, target.T).type(torch.float32)
+        # label_mask = torch.eq(target, target.T).type(torch.float32)
+        label_mask = torch.eye(target.shape[0]).to(target.device)
         positive_examples = label_mask.sum(dim=1)
 
         # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
