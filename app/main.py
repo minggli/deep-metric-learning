@@ -28,7 +28,7 @@ if __name__ == "__main__":
     model = Network(resnet18).to(get_torch_device())
     model = nn.DataParallel(model)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     loss = SoftNearestNeighborsLoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
 

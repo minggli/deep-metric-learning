@@ -24,7 +24,7 @@ class InfoNCELoss(CrossEntropyLoss):
 
 def _verbose_snnl(score, target):
     """verbose implementation of soft nearest neighbour loss."""
-    label_mask = torch.eq(target, target.T).type(torch.float32)
+    label_mask = torch.eq(target, target.T).float()
 
     negexp = torch.exp(score)
     negexp_zero_diag = negexp * (1 - torch.eye(target.shape[0]).to(target.device))
