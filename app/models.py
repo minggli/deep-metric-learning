@@ -45,12 +45,16 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
 
         label_mask = torch.eq(target, target.T).type(torch.float32)
         diagonal_mask = torch.diag(torch.stack([torch.tensor(-float("inf"))] * target.shape[0])).to(target.device)
+        at_least_two_positives_mask = (label_mask.sum(dim=1) > 1.).unsqueeze(1).float32()
+        label_mask *= at_least_two_positives_mask
 
         # as of Frosst et al 2019
         score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
-        score = score + diagonal_mask
+        score += diagonal_mask
 
-        loss = torch.log((F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo(torch.float32).eps)
+        loss = torch.log(
+            (F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo(torch.float32).eps
+        )
 
         # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()
