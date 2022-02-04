@@ -98,6 +98,7 @@ confidence=''
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
+generated-members='''numpy.*, torch.*'''
 disable='''print-statement,
         parameter-unpacking,
         unpacking-in-except,
@@ -181,4 +182,6 @@ disable='''print-statement,
         missing-class-docstring,
         missing-function-docstring,
         R0201,
+        invalid-name,
+        arguments-differ,
 '''

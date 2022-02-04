@@ -1,13 +1,14 @@
 import torch
+from torch.nn import CrossEntropyLoss, Module, Linear, GELU, Conv2d
 import torch.nn.functional as F
-from torch import nn
+from torch.nn import Parameter
 from torch.nn.modules.loss import _WeightedLoss
 from torchvision import models
 
 resnet18 = models.resnet18(pretrained=False)
 
 
-class InfoNCELoss(nn.CrossEntropyLoss):
+class InfoNCELoss(CrossEntropyLoss):
     # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -18,7 +19,7 @@ class InfoNCELoss(nn.CrossEntropyLoss):
 
         label_mask = torch.eye(target.shape[0]).to(target.device)
         # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
-        return super(InfoNCELoss, self).forward(input_2, label_mask)
+        return super().forward(input_2, label_mask)
 
 
 def _verbose_snnl(score, target):
@@ -55,20 +56,20 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         return (-1 * loss).mean()
 
 
-class Network(nn.Module):
-    def __init__(self, cnn_block: nn.Module, n_class: int = None) -> None:
+class Network(Module):
+    def __init__(self, cnn_block: Module, n_class: int = None) -> None:
         super().__init__()
         self.n_class = n_class
 
-        self.layer_1 = nn.Conv2d(1, 3, kernel_size=7, stride=2, padding=3, bias=False)
+        self.layer_1 = Conv2d(1, 3, kernel_size=7, stride=2, padding=3, bias=False)
         self.cnn_block = cnn_block
-        self.layer_2 = nn.GELU()
-        self.layer_3 = nn.Linear(1000, 64)
-        self.proj_W = nn.Parameter(torch.zeros(64, 64))
+        self.layer_2 = GELU()
+        self.layer_3 = Linear(1000, 64)
+        self.proj_W = Parameter(torch.zeros(64, 64))
         torch.nn.init.xavier_normal_(self.proj_W)
 
         if self.n_class:
-            self.logits_layer = nn.Linear(64, self.n_class)
+            self.logits_layer = Linear(64, self.n_class)
 
     def forward(self, x):
         x = self.layer_1(x)
