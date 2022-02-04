@@ -1,8 +1,8 @@
 import torch
-from torch import nn
-from torchvision import models
 import torch.nn.functional as F
+from torch import nn
 from torch.nn.modules.loss import _WeightedLoss
+from torchvision import models
 
 resnet18 = models.resnet18(pretrained=False)
 
@@ -22,21 +22,19 @@ class InfoNCELoss(nn.CrossEntropyLoss):
 
 
 def _verbose_snnl(score, target):
-    """verbose implementation of soft nearest neighbour loss.
-    """
+    """verbose implementation of soft nearest neighbour loss."""
     label_mask = torch.eq(target, target.T).type(torch.float32)
 
     negexp = torch.exp(score)
     negexp_zero_diag = negexp * (1 - torch.eye(target.shape[0]).to(target.device))
 
     return torch.log(
-        (negexp_zero_diag * label_mask).sum(dim=1) / negexp_zero_diag.sum(dim=1) \
-        + torch.finfo(torch.float32).eps
+        (negexp_zero_diag * label_mask).sum(dim=1) / negexp_zero_diag.sum(dim=1) + torch.finfo(torch.float32).eps
     )
 
 
 class SoftNearestNeighborsLoss(_WeightedLoss):
-    def __init__(self, *args, temperature: float = 1., **kwargs):
+    def __init__(self, *args, temperature: float = 1.0, **kwargs):
         super().__init__(*args, **kwargs)
         self.temperature = temperature
 
@@ -45,18 +43,13 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
             target.unsqueeze_(1)
 
         label_mask = torch.eq(target, target.T).type(torch.float32)
-        diagonal_mask = torch.diag(
-            torch.stack([torch.tensor(-float('inf'))] * target.shape[0])
-            ).to(target.device)
+        diagonal_mask = torch.diag(torch.stack([torch.tensor(-float("inf"))] * target.shape[0])).to(target.device)
 
         # as of Frosst et al 2019
         score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
         score = score + diagonal_mask
 
-        loss = torch.log(
-            (F.softmax(score, dim=1) * label_mask).sum(dim=1) \
-            + torch.finfo(torch.float32).eps
-            )
+        loss = torch.log((F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo(torch.float32).eps)
 
         # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()

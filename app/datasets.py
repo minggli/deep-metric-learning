@@ -2,6 +2,7 @@ from enum import Enum
 from typing import cast
 
 from torchvision.datasets import MNIST, FashionMNIST, ImageNet, VisionDataset
+
 from app.objects import BaseTransform, TargetTransform
 from app.utils import get_project_root
 
@@ -22,8 +23,20 @@ def load_dataset(
     target_transformer_instance: TargetTransform = target_transformer([])
 
     return (
-        dataset_klass(root, train=True, download=True, transform=transformer_instance, target_transform=target_transformer_instance),
-        dataset_klass(root, train=False, download=True, transform=transformer_instance, target_transform=target_transformer_instance),
+        dataset_klass(
+            root,
+            train=True,
+            download=True,
+            transform=transformer_instance,
+            target_transform=target_transformer_instance,
+        ),
+        dataset_klass(
+            root,
+            train=False,
+            download=True,
+            transform=transformer_instance,
+            target_transform=target_transformer_instance,
+        ),
     )
 
 
