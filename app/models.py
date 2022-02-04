@@ -15,7 +15,7 @@ class InfoNCELoss(nn.CrossEntropyLoss):
     def forward(self, input_1, input_2, target):
         if target.dim() < 2:
             target.unsqueeze_(1)
-        
+
         label_mask = torch.eye(target.shape[0]).to(target.device)
         # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
         loss = super(InfoNCELoss, self).forward(input_2, label_mask)
@@ -32,16 +32,15 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         if target.dim() < 2:
             target.unsqueeze_(1)
 
-        score = -1 * (torch.cdist(input_1, input_1, p=2).square() / self.temperature)
         label_mask = torch.eq(target, target.T).type(torch.float32)
+        score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
 
         loss = torch.log(
             (F.softmax(score, dim=1) * label_mask).sum(dim=1) \
             + torch.finfo(torch.float32).eps
-        )
-        loss *= -1
+            )
 
-        return loss.mean()
+        return (-1 * loss).mean()
 
 
 class Network(nn.Module):
@@ -65,5 +64,7 @@ class Network(nn.Module):
         norm_x = nn.functional.normalize(x)
 
         # Oord et al 2019 uses log-bilinear as function f that approximates Mutual Information
-        return [norm_x, norm_x @ self.proj_W @ norm_x.T]
+        bilinear = norm_x @ self.proj_W @ norm_x.T
+
+        return [norm_x, bilinear]
 
