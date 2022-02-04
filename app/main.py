@@ -8,7 +8,7 @@ from time import time
 
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test, train
-from app.models import Network, resnet18, InfoNCELoss, SoftNearestNeighborsLoss
+from app.models import Network, InfoNCELoss, SoftNearestNeighborsLoss, resnet18
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
 
@@ -35,7 +35,6 @@ if __name__ == "__main__":
 
     for epoch in range(10):
         train(train_batch_iter, model, loss, optimizer)
-        test(test_batch_iter, model, loss)
 
     with open(f"gs://saved_models_minggli/model_{timestamp}.pt", "wb") as f:
         torch.save(model, f)

@@ -5,8 +5,8 @@ def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     model.train()
     for batch_index, (x_train, y_train) in enumerate(dataloader):
-        logits = model(x_train)
-        loss = loss_fn(logits, y_train)
+        output_1, output_2 = model(x_train)
+        loss = loss_fn(output_1, output_2, y_train)
         optimizer.zero_grad()
         # DataParallel
         joined_loss = loss.mean()
@@ -25,8 +25,8 @@ def test(dataloader, model, loss_fn):
     test_loss, correct = 0, 0
     with torch.no_grad():
         for x_test, y_test in dataloader:
-            logits = model(x_test)
-            loss = loss_fn(logits, y_test)
+            output_1, output_2 = model(x_test)
+            loss = loss_fn(output_1, output_2, y_test)
             joined_loss = loss.mean()
             test_loss += joined_loss.item()
             correct += (logits.argmax(1) == y_test).type(torch.float32).sum().item()
