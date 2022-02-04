@@ -10,7 +10,7 @@ resnet18 = models.resnet18(pretrained=False)
 class InfoNCELoss(nn.CrossEntropyLoss):
     # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
     def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, reduction='none', **kwargs)
+        super().__init__(*args, **kwargs)
 
     def forward(self, input_1, input_2, target):
         if target.dim() < 2:
@@ -18,9 +18,21 @@ class InfoNCELoss(nn.CrossEntropyLoss):
 
         label_mask = torch.eye(target.shape[0]).to(target.device)
         # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
-        loss = super(InfoNCELoss, self).forward(input_2, label_mask)
+        return super(InfoNCELoss, self).forward(input_2, label_mask)
 
-        return loss.mean()
+
+def _verbose_snnl(score, target):
+    """verbose implementation of soft nearest neighbour loss.
+    """
+    label_mask = torch.eq(target, target.T).type(torch.float32)
+
+    negexp = torch.exp(score)
+    negexp_zero_diag = negexp * (1 - torch.eye(target.shape[0]).to(target.device))
+
+    return torch.log(
+        (negexp_zero_diag * label_mask).sum(dim=1) / negexp_zero_diag.sum(dim=1) \
+        + torch.finfo(torch.float32).eps
+    )
 
 
 class SoftNearestNeighborsLoss(_WeightedLoss):
@@ -33,19 +45,27 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
             target.unsqueeze_(1)
 
         label_mask = torch.eq(target, target.T).type(torch.float32)
+        diagonal_mask = torch.diag(
+            torch.stack([torch.tensor(-float('inf'))] * target.shape[0])
+            ).to(target.device)
+
+        # as of Frosst et al 2019
         score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
+        score = score + diagonal_mask
 
         loss = torch.log(
             (F.softmax(score, dim=1) * label_mask).sum(dim=1) \
             + torch.finfo(torch.float32).eps
             )
 
+        # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()
 
 
 class Network(nn.Module):
-    def __init__(self, cnn_block: nn.Module) -> None:
+    def __init__(self, cnn_block: nn.Module, n_class: int = None) -> None:
         super().__init__()
+        self.n_class = n_class
 
         self.layer_1 = nn.Conv2d(1, 3, kernel_size=7, stride=2, padding=3, bias=False)
         self.cnn_block = cnn_block
@@ -54,17 +74,21 @@ class Network(nn.Module):
         self.proj_W = nn.Parameter(torch.zeros(64, 64))
         torch.nn.init.xavier_normal_(self.proj_W)
 
+        if self.n_class:
+            self.logits_layer = nn.Linear(64, self.n_class)
+
     def forward(self, x):
         x = self.layer_1(x)
         x = self.cnn_block(x)
         x = self.layer_2(x)
         x = self.layer_3(x)
 
-        # project learned embeddings onto unit sphere
-        norm_x = nn.functional.normalize(x)
+        if self.n_class:
+            output_2 = self.logits_layer(x)
+        else:
+            # Oord et al 2019 uses log-bilinear as function f that approximates Mutual Information
+            # project learned embeddings onto unit sphere
+            norm_x = F.normalize(x)
+            output_2 = norm_x @ self.proj_W @ norm_x.T
 
-        # Oord et al 2019 uses log-bilinear as function f that approximates Mutual Information
-        bilinear = norm_x @ self.proj_W @ norm_x.T
-
-        return [norm_x, bilinear]
-
+        return [x, output_2]

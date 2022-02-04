@@ -29,7 +29,7 @@ def test(dataloader, model, loss_fn):
             loss = loss_fn(output_1, output_2, y_test)
             joined_loss = loss.mean()
             test_loss += joined_loss.item()
-            correct += (logits.argmax(1) == y_test).type(torch.float32).sum().item()
+            correct += (logits.argmax(1) == y_test).float32().sum().item()
     test_loss /= num_batches
     correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
