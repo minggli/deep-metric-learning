@@ -43,9 +43,9 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         if target.dim() < 2:
             target.unsqueeze_(1)
 
-        label_mask = torch.eq(target, target.T).type(torch.float32)
+        label_mask = torch.eq(target, target.T).float()
         diagonal_mask = torch.diag(torch.stack([torch.tensor(-float("inf"))] * target.shape[0])).to(target.device)
-        at_least_two_positives_mask = (label_mask.sum(dim=1) > 1.).unsqueeze(1).float32()
+        at_least_two_positives_mask = (label_mask.sum(dim=1) > 1.).unsqueeze(1).float()
         label_mask *= at_least_two_positives_mask
 
         # as of Frosst et al 2019
@@ -53,7 +53,7 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         score += diagonal_mask
 
         loss = torch.log(
-            (F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo(torch.float32).eps
+            (F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo().eps
         )
 
         # assert torch.allclose(loss, _verbose_snnl(score, target))
