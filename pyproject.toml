@@ -16,6 +16,8 @@ pylint = "^2.12.2"
 torchvision = "^0.11.3"
 PyYAML = "^6.0"
 smart-open = {extras = ["gcs"], version = "^5.2.1"}
+seaborn = "^0.11.2"
+Pillow = "^9.0.1"
 
 
 [tool.poetry.dev-dependencies]
