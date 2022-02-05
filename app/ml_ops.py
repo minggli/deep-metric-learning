@@ -3,6 +3,9 @@ from torch import nn
 from PIL import Image
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set()
 
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -49,7 +52,7 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
     tsne = TSNE(n_components=2, perplexity=50., init='pca', random_state=0)
     reduced_array = tsne.fit_transform(array)
 
-    fig = plt.figure(epoch, figsize=(12, 8), dpi=300)
+    fig = plt.figure(epoch, figsize=(12, 12), dpi=300)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
     ax.set_title(f"Epoch: {epoch + 1}")
@@ -60,5 +63,4 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
         fig.canvas.tostring_rgb())
 
     images.append(img)
-
 

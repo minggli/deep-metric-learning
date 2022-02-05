@@ -6,16 +6,12 @@ from smart_open import open
 from torch import nn
 from torch.utils.data import DataLoader
 
-import seaborn as sns
-
-
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test, train, visualise_embedding
 from app.models import InfoNCELoss, Network, SoftNearestNeighborsLoss, resnet18
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
 
-sns.set()
 
 PROJ_ROOT = get_project_root()
 with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
