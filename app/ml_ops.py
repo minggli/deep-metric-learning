@@ -4,6 +4,7 @@ import torch
 from PIL import Image
 from sklearn.manifold import TSNE
 from torch import nn
+import numpy as np
 
 sns.set()
 
@@ -47,15 +48,22 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
         model.eval()
         embedding_x, _ = model(x_test)
         array = embedding_x.cpu().numpy()
-        label = list(map(str, y_test.cpu().numpy().astype("int").tolist()))
+        label = np.asarray(list(map(str, y_test.cpu().numpy().astype("int").tolist())))
 
-    tsne = TSNE(n_components=2, perplexity=50.0, init="pca", random_state=0)
+    sorting_index = np.argsort(label)
+    label = label[sorting_index]
+    array = array[sorting_index]
+
+    tsne = TSNE(n_components=2, random_state=0)
     reduced_array = tsne.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=300)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
     ax.set_title(f"Epoch: {epoch + 1}")
+    ax.set_xlim([-30, 30])
+    ax.set_ylim([-30, 30])
+
     fig.canvas.draw()
 
     img = Image.frombytes("RGB", fig.canvas.get_width_height(), fig.canvas.tostring_rgb())

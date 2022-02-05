@@ -41,7 +41,7 @@ if __name__ == "__main__":
         visualise_embedding(epoch, images, x_test, y_test, model)
 
     with open(f"gs://saved_models_minggli/images_{timestamp}.gif", "wb") as f:
-        images[0].save(f, format="GIF", append_images=images[1:], save_all=True, duration=500, loop=0)
+        images[0].save(f, format="GIF", append_images=images[1:], save_all=True, duration=2000, loop=0)
 
     with open(f"gs://saved_models_minggli/model_{timestamp}.pt", "wb") as f:
         torch.save(model, f)
