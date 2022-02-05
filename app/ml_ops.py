@@ -1,9 +1,9 @@
-import torch
-from torch import nn
-from PIL import Image
-from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import seaborn as sns
+import torch
+from PIL import Image
+from sklearn.manifold import TSNE
+from torch import nn
 
 sns.set()
 
@@ -45,11 +45,11 @@ def test(dataloader, model, loss_fn):
 def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: torch.Tensor, model: nn.Module):
     with torch.no_grad():
         model.eval()
-        embedding_x, output_2 = model(x_test)
+        embedding_x, _ = model(x_test)
         array = embedding_x.cpu().numpy()
-        label = list(map(str, y_test.cpu().numpy().astype('int').tolist()))
+        label = list(map(str, y_test.cpu().numpy().astype("int").tolist()))
 
-    tsne = TSNE(n_components=2, perplexity=50., init='pca', random_state=0)
+    tsne = TSNE(n_components=2, perplexity=50.0, init="pca", random_state=0)
     reduced_array = tsne.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=300)
@@ -58,9 +58,5 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
     ax.set_title(f"Epoch: {epoch + 1}")
     fig.canvas.draw()
 
-    img = Image.frombytes('RGB', 
-        fig.canvas.get_width_height(),
-        fig.canvas.tostring_rgb())
-
+    img = Image.frombytes("RGB", fig.canvas.get_width_height(), fig.canvas.tostring_rgb())
     images.append(img)
-

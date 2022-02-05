@@ -12,7 +12,6 @@ from app.models import InfoNCELoss, Network, SoftNearestNeighborsLoss, resnet18
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
 
-
 PROJ_ROOT = get_project_root()
 with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
     model_config = yaml.safe_load(f)
@@ -34,19 +33,15 @@ if __name__ == "__main__":
     loss = nn.DataParallel(loss)
 
     timestamp = int(time())
-    for x_test, y_test in test_batch_iter:
-        break
+    x_test, y_test = next(iter(test_batch_iter))
 
-    images = []
+    images: list = []
     for epoch in range(10):
         train(train_batch_iter, model, loss, optimizer)
         visualise_embedding(epoch, images, x_test, y_test, model)
 
     with open(f"gs://saved_models_minggli/images_{timestamp}.gif", "wb") as f:
-        images[0].save(f,
-                format='GIF',
-                append_images=images[1:],
-                save_all=True, duration=500, loop=0)
-    
+        images[0].save(f, format="GIF", append_images=images[1:], save_all=True, duration=500, loop=0)
+
     with open(f"gs://saved_models_minggli/model_{timestamp}.pt", "wb") as f:
         torch.save(model, f)
