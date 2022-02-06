@@ -19,7 +19,7 @@ with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
 
 if __name__ == "__main__":
     ds_train, ds_test = load_dataset(
-        ExperimentDatasets.FASHION_MNIST, transformer=ImageTransform, target_transformer=TargetTransform
+        ExperimentDatasets.MNIST, transformer=ImageTransform, target_transformer=TargetTransform
     )
     train_batch_iter, test_batch_iter = DataLoader(
         ds_train, batch_size=model_config["batch_size"], shuffle=True, num_workers=0
