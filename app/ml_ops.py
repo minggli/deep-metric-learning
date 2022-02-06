@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
 from PIL import Image
-from sklearn.manifold import TSNE
 from torch import nn
 import numpy as np
+import umap
 
 sns.set()
 
@@ -54,15 +54,15 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
     label = label[sorting_index]
     array = array[sorting_index]
 
-    tsne = TSNE(n_components=2, random_state=0)
-    reduced_array = tsne.fit_transform(array)
+    reducer = umap.UMAP(n_components=2, min_dist=0.5, random_state=0)
+    reduced_array = reducer.fit_transform(array)
 
-    fig = plt.figure(epoch, figsize=(12, 12), dpi=300)
+    fig = plt.figure(epoch, figsize=(12, 12), dpi=200)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
     ax.set_title(f"Epoch: {epoch + 1}")
-    ax.set_xlim([-30, 30])
-    ax.set_ylim([-30, 30])
+    ax.set_xlim([-25, 25])
+    ax.set_ylim([-25, 25])
 
     fig.canvas.draw()
 
