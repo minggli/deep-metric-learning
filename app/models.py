@@ -10,6 +10,7 @@ resnet18 = models.resnet18(pretrained=False)
 
 class InfoNCELoss(CrossEntropyLoss):
     # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
+    # Identity one positive example against noise examples
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -17,9 +18,20 @@ class InfoNCELoss(CrossEntropyLoss):
         if target.dim() < 2:
             target.unsqueeze_(1)
 
+        positive_mask = torch.eq(target, target.T)
+        diag_mask = torch.eye(target.shape[0]).bool().to(target.device)
+        off_diag_pos_mask = torch.logical_and(positive_mask, ~diag_mask)
+        # send off-diagonal positive example logits to negative infinity inside softmax
+        off_diag_pos_inf = torch.where(
+            off_diag_pos_mask,
+            torch.log(torch.tensor(0.) + torch.finfo().eps).to(target.device),
+            torch.tensor(0.).to(target.device))
+        score = input_2 + off_diag_pos_inf
+
         label_mask = torch.eye(target.shape[0]).to(target.device)
-        # equivalent to -(F.log_softmax(input_x, dim=1) * label_mask).sum(1))
-        return super().forward(input_2, label_mask)
+        # equivalent to -(F.log_softmax(score, dim=1) * label_mask).sum(1).mean()
+        return super().forward(score, label_mask)
+
 
 
 def _verbose_snnl(score, target):
@@ -43,21 +55,20 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         if target.dim() < 2:
             target.unsqueeze_(1)
 
-        label_mask = torch.eq(target, target.T).float()
-        diagonal_mask = torch.diag(
+        positive_mask = torch.eq(target, target.T).float()
+        diagonal_inf = torch.diag(
             torch.stack([torch.tensor(-float("inf"))] * target.shape[0])
             ).to(target.device)
-        at_least_two_positives_mask = (label_mask.sum(dim=1) > 1.).unsqueeze(1).float()
-        label_mask *= at_least_two_positives_mask
+        at_least_two_positives_mask = (positive_mask.sum(dim=1) > 1.).unsqueeze(1).float()
+        positive_mask *= at_least_two_positives_mask
 
         # as of Frosst et al 2019
         score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
-        score += diagonal_mask
+        score += diagonal_inf
 
         loss = torch.log(
-            (F.softmax(score, dim=1) * label_mask).sum(dim=1) + torch.finfo().eps
+            (F.softmax(score, dim=1) * positive_mask).sum(dim=1) + torch.finfo().eps
         )
-
         # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()
 
