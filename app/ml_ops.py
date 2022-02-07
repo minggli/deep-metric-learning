@@ -55,15 +55,15 @@ def visualise_embedding(epoch: int, images: list, x_test: torch.Tensor, y_test: 
     label = label[sorting_index]
     array = array[sorting_index]
 
-    reducer = TSNE(n_components=2, perplexity=15, n_iter=3000, learning_rate='auto', init='pca', random_state=0)
+    reducer = TSNE(n_components=2, perplexity=30., n_iter=3000, learning_rate='auto', init='pca', random_state=0)
     reduced_array = reducer.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
     ax.set_title(f"Epoch: {epoch + 1}")
-    ax.set_xlim([-30, 30])
-    ax.set_ylim([-30, 30])
+    ax.set_xlim([-50, 50])
+    ax.set_ylim([-50, 50])
 
     fig.canvas.draw()
 
