@@ -83,10 +83,8 @@ class Network(Module):
         self.layer_2 = GELU()
         self.layer_3 = Linear(1000, 64)
         self.proj_W = Parameter(torch.zeros(64, 64))
+        self.logits_layer = Linear(64, self.n_class)
         torch.nn.init.xavier_normal_(self.proj_W)
-
-        if self.n_class:
-            self.logits_layer = Linear(64, self.n_class)
 
     def forward(self, x):
         x = self.layer_1(x)
