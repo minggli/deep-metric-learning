@@ -19,6 +19,7 @@ smart-open = {extras = ["gcs"], version = "^5.2.1"}
 seaborn = "^0.11.2"
 Pillow = "^9.0.1"
 scikit-learn = "^1.0.2"
+types-PyYAML = "^6.0.4"
 
 
 [tool.poetry.dev-dependencies]

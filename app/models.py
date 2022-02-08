@@ -1,7 +1,6 @@
 import torch
-from torch.nn import CrossEntropyLoss, Module, Linear, GELU, Conv2d
 import torch.nn.functional as F
-from torch.nn import Parameter
+from torch.nn import GELU, Conv2d, CrossEntropyLoss, Linear, Module, Parameter
 from torch.nn.modules.loss import _WeightedLoss
 from torchvision import models
 
@@ -24,14 +23,14 @@ class InfoNCELoss(CrossEntropyLoss):
         # send off-diagonal positive example logits to negative infinity inside softmax
         off_diag_pos_inf = torch.where(
             off_diag_pos_mask,
-            torch.log(torch.tensor(0.) + torch.finfo().eps).to(target.device),
-            torch.tensor(0.).to(target.device))
+            torch.log(torch.tensor(0.0) + torch.finfo().eps).to(target.device),
+            torch.tensor(0.0).to(target.device),
+        )
         score = input_2 + off_diag_pos_inf
 
         label_mask = torch.eye(target.shape[0]).to(target.device)
         # equivalent to -(F.log_softmax(score, dim=1) * label_mask).sum(1).mean()
         return super().forward(score, label_mask)
-
 
 
 def _verbose_snnl(score, target):
@@ -56,19 +55,15 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
             target.unsqueeze_(1)
 
         positive_mask = torch.eq(target, target.T).float()
-        diagonal_inf = torch.diag(
-            torch.stack([torch.tensor(-float("inf"))] * target.shape[0])
-            ).to(target.device)
-        at_least_two_positives_mask = (positive_mask.sum(dim=1) > 1.).unsqueeze(1).float()
+        diagonal_inf = torch.diag(torch.stack([torch.tensor(-float("inf"))] * target.shape[0])).to(target.device)
+        at_least_two_positives_mask = (positive_mask.sum(dim=1) > 1.0).unsqueeze(1).float()
         positive_mask *= at_least_two_positives_mask
 
         # as of Frosst et al 2019
         score = -1 * torch.cdist(input_1, input_1, p=2).square() / self.temperature
         score += diagonal_inf
 
-        loss = torch.log(
-            (F.softmax(score, dim=1) * positive_mask).sum(dim=1) + torch.finfo().eps
-        )
+        loss = torch.log((F.softmax(score, dim=1) * positive_mask).sum(dim=1) + torch.finfo().eps)
         # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()
 
@@ -83,7 +78,9 @@ class Network(Module):
         self.layer_2 = GELU()
         self.layer_3 = Linear(1000, 64)
         self.proj_W = Parameter(torch.zeros(64, 64))
-        self.logits_layer = Linear(64, self.n_class)
+
+        if self.n_class:
+            self.logits_layer = Linear(64, self.n_class)
         torch.nn.init.xavier_normal_(self.proj_W)
 
     def forward(self, x):

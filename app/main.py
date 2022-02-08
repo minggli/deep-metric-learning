@@ -7,7 +7,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from app.datasets import ExperimentDatasets, load_dataset
-from app.ml_ops import train, visualise_embedding, test_single_batch
+from app.ml_ops import test_single_batch, train, visualise_embedding
 from app.models import InfoNCELoss, Network, SoftNearestNeighborsLoss, resnet18
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
@@ -30,9 +30,9 @@ if __name__ == "__main__":
     model = nn.DataParallel(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    loss = nn.CrossEntropyLoss().to(get_torch_device())
+    loss: nn.Module = nn.CrossEntropyLoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
-    loss_name = getattr(loss, 'module', loss).__class__.__name__
+    loss_name = getattr(loss, "module", loss).__class__.__name__
 
     timestamp = int(time())
     x_test, y_test = next(iter(test_batch_iter))
