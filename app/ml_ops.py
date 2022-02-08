@@ -9,9 +9,12 @@ from torch import nn
 
 sns.set()
 
+def is_module_crossentropy(module: nn.Module) -> bool:
+    return type(getattr(module, "module", module)) == nn.CrossEntropyLoss
+
 
 def _calculate_loss(output_1: torch.Tensor, output_2: torch.Tensor, y_train: torch.Tensor, loss_fn: nn.Module):
-    if type(getattr(loss_fn, "module", loss_fn)) == nn.CrossEntropyLoss:
+    if is_module_crossentropy(loss_fn):
         loss = loss_fn(output_2, y_train)
     else:
         loss = loss_fn(output_1, output_2, y_train)
@@ -44,7 +47,7 @@ def test_single_batch(x_test, y_test, model, loss_fn):
         joined_loss = loss.mean()
         test_loss = joined_loss.item()
 
-        if isinstance(getattr(loss_fn, "module", loss_fn), nn.CrossEntropyLoss):
+        if is_module_crossentropy(loss_fn):
             y_pred = output_2.argmax(dim=1).detach().cpu().numpy()
             y_test = y_test.detach().cpu().numpy()
             f1 = f1_score(y_test, y_pred, average="macro")
