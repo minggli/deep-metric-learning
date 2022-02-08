@@ -11,7 +11,6 @@ sns.set()
 
 
 def _calculate_loss(output_1: torch.Tensor, output_2: torch.Tensor, y_train: torch.Tensor, loss_fn: nn.Module):
-
     if type(getattr(loss_fn, "module", loss_fn)) == nn.CrossEntropyLoss:
         loss = loss_fn(output_2, y_train)
     else:
@@ -25,7 +24,6 @@ def train(dataloader, model, loss_fn, optimizer):
     model.train()
     for batch_index, (x_train, y_train) in enumerate(dataloader):
         output_1, output_2 = model(x_train)
-        breakpoint()
         loss = _calculate_loss(output_1, output_2, y_train, loss_fn)
         optimizer.zero_grad()
         # DataParallel
