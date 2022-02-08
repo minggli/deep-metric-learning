@@ -15,7 +15,15 @@ def train(dataloader, model, loss_fn, optimizer):
     model.train()
     for batch_index, (x_train, y_train) in enumerate(dataloader):
         output_1, output_2 = model(x_train)
-        loss = loss_fn(output_1, output_2, y_train)
+
+        if isinstance(
+            getattr(loss_fn, "module", loss_fn),
+            nn.CrossEntropyLoss
+            ):
+            loss = loss_fn(output_2, y_train)
+        else:
+            loss = loss_fn(output_1, output_2, y_train)
+
         optimizer.zero_grad()
         # DataParallel
         joined_loss = loss.mean()
