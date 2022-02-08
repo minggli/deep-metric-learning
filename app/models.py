@@ -20,7 +20,7 @@ class InfoNCELoss(CrossEntropyLoss):
         positive_mask = torch.eq(target, target.T)
         diag_mask = torch.eye(target.shape[0]).bool().to(target.device)
         off_diag_pos_mask = torch.logical_and(positive_mask, ~diag_mask)
-        # send off-diagonal positive example logits to negative infinity inside softmax
+        # ignore off-diagonal positive example by sending logits to negative infinity before softmax
         off_diag_pos_inf = torch.where(
             off_diag_pos_mask,
             torch.log(torch.tensor(0.0) + torch.finfo().eps).to(target.device),
