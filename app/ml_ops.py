@@ -34,7 +34,7 @@ def train(dataloader, model, loss_fn, optimizer):
         joined_loss.backward()
         optimizer.step()
 
-        if batch_index % 100 == 0:
+        if batch_index % 10 == 0:
             loss, current = joined_loss.item(), batch_index * len(x_train)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
@@ -86,7 +86,7 @@ def visualise_embedding(
     label = label[sorting_index]
     array = array[sorting_index]
 
-    reducer = TSNE(n_components=2, perplexity=30.0, n_iter=3000, learning_rate="auto", random_state=0)
+    reducer = TSNE(n_components=2, perplexity=30.0, n_iter=3000, learning_rate="auto", init='pca', random_state=0)
     reduced_array = reducer.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)

@@ -18,6 +18,7 @@ class ImageTransform(BaseTransform):
         _ = transforms
         super().__init__(
             [
+                T.RandAugment(),
                 T.ToTensor(),
                 T.Lambda(assign_device),
             ]
