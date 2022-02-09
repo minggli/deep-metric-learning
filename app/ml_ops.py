@@ -7,10 +7,9 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import f1_score
 from torch import nn
 
-sns.set()
+from app.utils import is_module_crossentropy
 
-def is_module_crossentropy(module: nn.Module) -> bool:
-    return type(getattr(module, "module", module)) == nn.CrossEntropyLoss
+sns.set()
 
 
 def _calculate_loss(output_1: torch.Tensor, output_2: torch.Tensor, y_train: torch.Tensor, loss_fn: nn.Module):

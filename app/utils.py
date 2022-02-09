@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import torch
+from torch import nn
 
 
 def get_torch_device():
@@ -11,3 +12,7 @@ def get_torch_device():
 
 def get_project_root() -> Path:
     return Path(__file__).parent.parent
+
+
+def is_module_crossentropy(module: nn.Module) -> bool:
+    return type(getattr(module, "module", module)) == nn.CrossEntropyLoss
