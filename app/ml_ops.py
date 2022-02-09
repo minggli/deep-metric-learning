@@ -85,15 +85,15 @@ def visualise_embedding(
     label = label[sorting_index]
     array = array[sorting_index]
 
-    reducer = TSNE(n_components=2, perplexity=30.0, n_iter=3000, learning_rate="auto", init='pca', random_state=0)
+    reducer = TSNE(n_components=2, perplexity=15.0, learning_rate="auto", init='pca', random_state=0)
     reduced_array = reducer.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
     ax.set_title(f"{dataset_name}, {loss_name}, Epoch: {epoch + 1}")
-    ax.set_xlim([-50, 50])
-    ax.set_ylim([-50, 50])
+    ax.set_xlim([-70, 70])
+    ax.set_ylim([-70, 70])
 
     fig.canvas.draw()
 
