@@ -18,9 +18,10 @@ with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
 
 
 if __name__ == "__main__":
-    dataset = ExperimentDatasets.MNIST
-    ds_train, ds_test = load_dataset(dataset, transformer=ImageTransform, target_transformer=TargetTransform)
+    dataset = getattr(ExperimentDatasets, model_config['dataset'])
     dataset_name = str(dataset.name)
+
+    ds_train, ds_test = load_dataset(dataset, transformer=ImageTransform, target_transformer=TargetTransform)
     train_batch_iter, test_batch_iter = DataLoader(
         ds_train, batch_size=model_config["batch_size"], shuffle=True, num_workers=0
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=False, num_workers=0)
@@ -29,8 +30,8 @@ if __name__ == "__main__":
     model = Network(resnet18, n_class=None).to(get_torch_device())
     model = nn.DataParallel(model)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    loss: nn.Module = InfoNCELoss().to(get_torch_device())
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    loss: nn.Module = SoftNearestNeighborsLoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
     loss_name = getattr(loss, "module", loss).__class__.__name__
 
@@ -38,9 +39,10 @@ if __name__ == "__main__":
     x_test, y_test = next(iter(test_batch_iter))
 
     images: list = []
-    for epoch in range(10):
-        visualise_embedding(loss_name, dataset_name, epoch, images, x_test, y_test, model)
+    visualise_embedding(loss_name, dataset_name, 0, images, x_test, y_test, model)
+    for epoch in range(1, 15):
         train(train_batch_iter, model, loss, optimizer)
+        visualise_embedding(loss_name, dataset_name, epoch, images, x_test, y_test, model)
         test_single_batch(x_test, y_test, model, loss)
 
     with open(f"gs://saved_models_minggli/images_{timestamp}.gif", "wb") as f:

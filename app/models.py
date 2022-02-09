@@ -33,18 +33,6 @@ class InfoNCELoss(CrossEntropyLoss):
         return super().forward(score, label_mask)
 
 
-def _verbose_snnl(score, target):
-    """verbose implementation of soft nearest neighbour loss."""
-    label_mask = torch.eq(target, target.T).float()
-
-    negexp = torch.exp(score)
-    negexp_zero_diag = negexp * (1 - torch.eye(target.shape[0]).to(target.device))
-
-    return torch.log(
-        (negexp_zero_diag * label_mask).sum(dim=1) / negexp_zero_diag.sum(dim=1) + torch.finfo(torch.float32).eps
-    )
-
-
 class SoftNearestNeighborsLoss(_WeightedLoss):
     def __init__(self, *args, temperature: float = 1.0, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,7 +52,6 @@ class SoftNearestNeighborsLoss(_WeightedLoss):
         score += diagonal_inf
 
         loss = torch.log((F.softmax(score, dim=1) * positive_mask).sum(dim=1) + torch.finfo().eps)
-        # assert torch.allclose(loss, _verbose_snnl(score, target))
         return (-1 * loss).mean()
 
 
@@ -81,6 +68,7 @@ class Network(Module):
 
         if self.n_class:
             self.logits_layer = Linear(64, self.n_class)
+
         torch.nn.init.xavier_normal_(self.proj_W)
 
     def forward(self, x):
@@ -97,4 +85,5 @@ class Network(Module):
             norm_x = F.normalize(x)
             output_2 = norm_x @ self.proj_W @ norm_x.T
 
-        return [x, output_2]
+        norm_x = F.normalize(x)
+        return [norm_x, output_2]
