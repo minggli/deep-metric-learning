@@ -85,5 +85,4 @@ class Network(Module):
             norm_x = F.normalize(x)
             output_2 = norm_x @ self.proj_W @ norm_x.T
 
-        norm_x = F.normalize(x)
-        return [norm_x, output_2]
+        return [x, output_2]

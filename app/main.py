@@ -27,11 +27,11 @@ if __name__ == "__main__":
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=False, num_workers=0)
 
     n_class = ds_train.targets.unique().shape[0]
-    model = Network(resnet18, n_class=None).to(get_torch_device())
+    model = Network(resnet18, n_class=n_class).to(get_torch_device())
     model = nn.DataParallel(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    loss: nn.Module = SoftNearestNeighborsLoss().to(get_torch_device())
+    loss: nn.Module = nn.CrossEntropyLoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
     loss_name = getattr(loss, "module", loss).__class__.__name__
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     images: list = []
     visualise_embedding(loss_name, dataset_name, 0, images, x_test, y_test, model)
-    for epoch in range(1, 15):
+    for epoch in range(1, 10):
         train(train_batch_iter, model, loss, optimizer)
         visualise_embedding(loss_name, dataset_name, epoch, images, x_test, y_test, model)
         test_single_batch(x_test, y_test, model, loss)
