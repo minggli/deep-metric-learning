@@ -775,6 +775,18 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "ngt"
+version = "1.12.2"
+description = "python NGT"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = "*"
+pybind11 = "*"
+
+[[package]]
 name = "notebook"
 version = "6.4.8"
 description = "A web-based notebook environment for interactive computing"
@@ -986,6 +998,17 @@ python-versions = "*"
 
 [package.dependencies]
 pyasn1 = ">=0.4.6,<0.5.0"
+
+[[package]]
+name = "pybind11"
+version = "2.9.1"
+description = "Seamless operability between C++11 and Python"
+category = "main"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+
+[package.extras]
+global = ["pybind11-global (==2.9.1)"]
 
 [[package]]
 name = "pycparser"
@@ -1441,7 +1464,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5c51b2828f168731bff8c508959d06707161496f88d499d75e633211bd4d3c92"
+content-hash = "5e103e42085fbbba31d1a2bbcf9c4eecf6e34d923f9ee4e7afbb96379adb0793"
 
 [metadata.files]
 appnope = [
@@ -1999,6 +2022,17 @@ nest-asyncio = [
     {file = "nest_asyncio-1.5.4-py3-none-any.whl", hash = "sha256:3fdd0d6061a2bb16f21fe8a9c6a7945be83521d81a0d15cff52e9edee50101d6"},
     {file = "nest_asyncio-1.5.4.tar.gz", hash = "sha256:f969f6013a16fadb4adcf09d11a68a4f617c6049d7af7ac2c676110169a63abd"},
 ]
+ngt = [
+    {file = "ngt-1.12.2-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:bec79ff772633518586110508b182a9d62934602e207378e20c7628440defd38"},
+    {file = "ngt-1.12.2-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:167b19302fe2e5097262edea70c404d06070f8f9f4b707f25a5fb611b46f9ce0"},
+    {file = "ngt-1.12.2-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:ac91f5efa52ffcd01f6c688580c9110a273a1a4985da0a2ac123b34690dc0aaa"},
+    {file = "ngt-1.12.2-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:f94aa566f885684bd4193ce2792e09668575499121a4464a7f0276c3f0bd1dd3"},
+    {file = "ngt-1.12.2-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:527bd227838b753ec2a17fde1a6e52e30524dffa3834c98e9b48bd593e2db82e"},
+    {file = "ngt-1.12.2-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:bfe5888ffe3748eb0bbc39a6a07794210895fefc5d8e894362bf8f82af91b4ae"},
+    {file = "ngt-1.12.2-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:eeb89c14d4bb5ba45a704e10bc9ed79c2017b9a92dfd4d9ac6ad5a22f3b05935"},
+    {file = "ngt-1.12.2-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:d4a5be5cf906997d4eaef2d7fb6ad6328521ffafb29091981a9db29bb09b83a8"},
+    {file = "ngt-1.12.2-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:05b48ded100baf0d24111540b97c504e28413bd8a554086ab6ac0dda6f9d64bb"},
+]
 notebook = [
     {file = "notebook-6.4.8-py3-none-any.whl", hash = "sha256:3e702fcc54b8ae597533c3864793b7a1e971dec9e112f67235828d8a798fd654"},
     {file = "notebook-6.4.8.tar.gz", hash = "sha256:1e985c9dc6f678bdfffb9dc657306b5469bfa62d73e03f74e8defbf76d284312"},
@@ -2189,6 +2223,10 @@ pyasn1-modules = [
     {file = "pyasn1_modules-0.2.8-py3.5.egg", hash = "sha256:426edb7a5e8879f1ec54a1864f16b882c2837bfd06eee62f2c982315ee2473ed"},
     {file = "pyasn1_modules-0.2.8-py3.6.egg", hash = "sha256:cbac4bc38d117f2a49aeedec4407d23e8866ea4ac27ff2cf7fb3e5b570df19e0"},
     {file = "pyasn1_modules-0.2.8-py3.7.egg", hash = "sha256:c29a5e5cc7a3f05926aff34e097e84f8589cd790ce0ed41b67aed6857b26aafd"},
+]
+pybind11 = [
+    {file = "pybind11-2.9.1-py2.py3-none-any.whl", hash = "sha256:b570d17ed34b0f8ff43f5647833db87353be9afca0c7d1d69e92706b10a9c961"},
+    {file = "pybind11-2.9.1.tar.gz", hash = "sha256:40f8e57af6fcaa7eb5d727707125f90f8daa0993f28a9981a232d40c85dbbcb0"},
 ]
 pycparser = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
