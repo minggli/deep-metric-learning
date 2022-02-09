@@ -18,9 +18,12 @@ with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
 
 
 if __name__ == "__main__":
+
+    dataset = ExperimentDatasets.FASHION_MNIST
     ds_train, ds_test = load_dataset(
-        ExperimentDatasets.MNIST, transformer=ImageTransform, target_transformer=TargetTransform
+        dataset, transformer=ImageTransform, target_transformer=TargetTransform
     )
+    dataset_name = str(dataset.name)
     train_batch_iter, test_batch_iter = DataLoader(
         ds_train, batch_size=model_config["batch_size"], shuffle=True, num_workers=0
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=False, num_workers=0)
@@ -39,7 +42,7 @@ if __name__ == "__main__":
 
     images: list = []
     for epoch in range(10):
-        visualise_embedding(loss_name, epoch, images, x_test, y_test, model)
+        visualise_embedding(loss_name, dataset_name, epoch, images, x_test, y_test, model)
         train(train_batch_iter, model, loss, optimizer)
         test_single_batch(x_test, y_test, model, loss)
 

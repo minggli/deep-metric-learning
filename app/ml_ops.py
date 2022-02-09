@@ -74,7 +74,7 @@ def test(dataloader, model, loss_fn):
 
 
 def visualise_embedding(
-    loss_name: str, epoch: int, images: list, x_test: torch.Tensor, y_test: torch.Tensor, model: nn.Module
+    loss_name: str, dataset_name: str, epoch: int, images: list, x_test: torch.Tensor, y_test: torch.Tensor, model: nn.Module
 ):
     with torch.no_grad():
         model.eval()
@@ -92,7 +92,7 @@ def visualise_embedding(
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)
     ax = fig.gca()
     sns.scatterplot(x=reduced_array[:, 0], y=reduced_array[:, 1], hue=label, ax=ax)
-    ax.set_title(f"{loss_name}, Epoch: {epoch + 1}")
+    ax.set_title(f"{dataset_name}, {loss_name}, Epoch: {epoch + 1}")
     ax.set_xlim([-50, 50])
     ax.set_ylim([-50, 50])
 
