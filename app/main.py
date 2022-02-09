@@ -18,11 +18,8 @@ with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
 
 
 if __name__ == "__main__":
-
-    dataset = ExperimentDatasets.FASHION_MNIST
-    ds_train, ds_test = load_dataset(
-        dataset, transformer=ImageTransform, target_transformer=TargetTransform
-    )
+    dataset = ExperimentDatasets.MNIST
+    ds_train, ds_test = load_dataset(dataset, transformer=ImageTransform, target_transformer=TargetTransform)
     dataset_name = str(dataset.name)
     train_batch_iter, test_batch_iter = DataLoader(
         ds_train, batch_size=model_config["batch_size"], shuffle=True, num_workers=0
@@ -32,8 +29,8 @@ if __name__ == "__main__":
     model = Network(resnet18, n_class=None).to(get_torch_device())
     model = nn.DataParallel(model)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    loss: nn.Module = SoftNearestNeighborsLoss().to(get_torch_device())
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    loss: nn.Module = InfoNCELoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
     loss_name = getattr(loss, "module", loss).__class__.__name__
 
