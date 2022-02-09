@@ -86,7 +86,7 @@ def visualise_embedding(
     label = label[sorting_index]
     array = array[sorting_index]
 
-    reducer = TSNE(n_components=2, perplexity=30.0, n_iter=3000, learning_rate="auto", init="pca", random_state=0)
+    reducer = TSNE(n_components=2, perplexity=30.0, n_iter=3000, learning_rate="auto", random_state=0)
     reduced_array = reducer.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)
