@@ -1,1 +1,2 @@
 batch_size: 1024
+dataset: FASHION_MNIST
