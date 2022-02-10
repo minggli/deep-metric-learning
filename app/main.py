@@ -27,11 +27,11 @@ if __name__ == "__main__":
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=False, num_workers=0)
 
     n_class = ds_train.targets.unique().shape[0]
-    model = Network(resnet18, n_class=n_class).to(get_torch_device())
+    model = Network(resnet18, n_class=None).to(get_torch_device())
     model = nn.DataParallel(model)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-    loss: nn.Module = nn.CrossEntropyLoss().to(get_torch_device())
+    optimizer = torch.optim.Adam(model.parameters(), lr=5e-4)
+    loss: nn.Module = InfoNCELoss().to(get_torch_device())
     loss = nn.DataParallel(loss)
     loss_name = getattr(loss, "module", loss).__class__.__name__
 
