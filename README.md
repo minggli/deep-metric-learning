@@ -1,7 +1,7 @@
 # Deep Metric Learning
 This repository contains exploratory study of recent advancements of Deep Metric Learning in particular Contrastive Representation Learning.
 
-InfoNCE ([Oord et al 2019][1]) is based on Noise Contrastive Estimation ([Gutmann and Hyvarinen][2]) and aims to maximise _Mutual Information_ of query-document pair (or as put originally, context and signal). NCE itself is a generalization of triplet loss used in FaceNet ([Schroff et al 2015][3]) to multiple negative examples.
+InfoNCE ([Oord et al 2019][1]) is based on Noise Contrastive Estimation ([Gutmann and Hyvarinen 2012][2]) and aims to maximise _Mutual Information_ of query-document pair (or as put originally, context and signal). NCE itself is a generalization of triplet loss used in FaceNet ([Schroff et al 2015][3]) to multiple negative examples.
 
 Some intimate connection between NCE and Generative Adverserial Networks (GANs) have been discussed ([Goodfellow 2015][4], [Frosst 2019][5]).
 
