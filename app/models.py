@@ -10,8 +10,9 @@ resnet18 = models.resnet18(pretrained=False)
 class InfoNCELoss(CrossEntropyLoss):
     # Oord et al 2019, Representation Learning with Contrastive Predictive Coding
     # Identity one positive example against noise examples
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, temperature: float = 1.0, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.temperature = temperature
 
     def forward(self, input_1, input_2, target):
         if target.dim() < 2:
@@ -26,7 +27,7 @@ class InfoNCELoss(CrossEntropyLoss):
             torch.log(torch.tensor(0.0) + torch.finfo().eps).to(target.device),
             torch.tensor(0.0).to(target.device),
         )
-        score = input_2 + off_diag_pos_inf
+        score = (input_2 + off_diag_pos_inf) / self.temperature
 
         label_mask = torch.eye(target.shape[0]).to(target.device)
         # equivalent to -(F.log_softmax(score, dim=1) * label_mask).sum(1).mean()
