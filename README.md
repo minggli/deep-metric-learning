@@ -11,13 +11,13 @@ Soft Nearest Neighbour Loss ([Frosst 2019][5]) further generalises InfoNCE to al
 Visualisation were produced using representation of last layer of untrained `ResNet18` and t-SNE.
 
 ### MNIST
-| Cross Entropy | InfoNCE      |Soft NN Loss|
-|:-------------:|:------------:|:----------:|
+| Cross Entropy| InfoNCE      |Soft NN Loss  |
+|:------------:|:------------:|:------------:|
 |![alt text](assets/images_1644456003.gif "MNIST, CrossEntropyLoss")|![alt text](assets/images_1644456757.gif "MNIST, InfoNCE")|![alt text](assets/images_1644457560.gif "MNIST, SoftNearestNeighbourLoss")|
 
 ### Fashion-MNIST
-| Cross Entropy | InfoNCE      |Soft NN Loss|
-|:-------------:|:------------:|:----------:|
+| Cross Entropy| InfoNCE      |Soft NN Loss  |
+|:------------:|:------------:|:------------:|
 |![alt text](assets/images_1644455093.gif "Fashion-MNIST, CrossEntropyLoss")|![alt text](assets/images_1644452471.gif "Fashion-MNIST, InfoNCE")|![alt text](assets/images_1644453434.gif "Fashion-MNIST, SoftNearestNeighbourLoss")|
 
 ### Requirement
