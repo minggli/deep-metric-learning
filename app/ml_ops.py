@@ -73,7 +73,13 @@ def test(dataloader, model, loss_fn):
 
 
 def visualise_embedding(
-    loss_name: str, dataset_name: str, epoch: int, images: list, x_test: torch.Tensor, y_test: torch.Tensor, model: nn.Module
+    loss_name: str,
+    dataset_name: str,
+    epoch: int,
+    images: list,
+    x_test: torch.Tensor,
+    y_test: torch.Tensor,
+    model: nn.Module,
 ):
     with torch.no_grad():
         model.eval()
@@ -85,7 +91,7 @@ def visualise_embedding(
     label = label[sorting_index]
     array = array[sorting_index]
 
-    reducer = TSNE(n_components=2, perplexity=15.0, learning_rate="auto", init='pca', random_state=0)
+    reducer = TSNE(n_components=2, perplexity=15.0, learning_rate="auto", init="pca", random_state=0)
     reduced_array = reducer.fit_transform(array)
 
     fig = plt.figure(epoch, figsize=(12, 12), dpi=200)

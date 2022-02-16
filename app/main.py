@@ -5,20 +5,21 @@ import yaml
 from smart_open import open
 from torch import nn
 from torch.utils.data import DataLoader
+from torchvision import models
 
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test_single_batch, train, visualise_embedding
-from app.models import InfoNCELoss, Network, SoftNearestNeighborsLoss, resnet18
+from app.models import InfoNCELoss, Network, SoftNearestNeighborsLoss
 from app.objects import ImageTransform, TargetTransform
 from app.utils import get_project_root, get_torch_device
 
-PROJ_ROOT = get_project_root()
-with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
-    model_config = yaml.safe_load(f)
 
+def run():
+    PROJ_ROOT = get_project_root()
+    with open(PROJ_ROOT / "app/model_cfg.yaml", encoding="utf-8") as f:
+        model_config = yaml.safe_load(f)
 
-if __name__ == "__main__":
-    dataset = getattr(ExperimentDatasets, model_config['dataset'])
+    dataset = getattr(ExperimentDatasets, model_config["dataset"])
     dataset_name = str(dataset.name)
 
     ds_train, ds_test = load_dataset(dataset, transformer=ImageTransform, target_transformer=TargetTransform)
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     ), DataLoader(ds_test, batch_size=model_config["batch_size"], shuffle=False, num_workers=0)
 
     n_class = ds_train.targets.unique().shape[0]
+    resnet18 = models.resnet18(pretrained=False)
     model = Network(resnet18, n_class=None).to(get_torch_device())
     model = nn.DataParallel(model)
 
@@ -50,3 +52,7 @@ if __name__ == "__main__":
 
     with open(f"gs://saved_models_minggli/model_{timestamp}.pt", "wb") as f:
         torch.save(model, f)
+
+
+if __name__ == "__main__":
+    run()

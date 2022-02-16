@@ -1,2 +1,5 @@
 batch_size: 1024
-dataset: FASHION_MNIST
+dataset: MNIST
+retrieval_model_id: 1644865003
+indexer_prefix: ngt_indexer
+embedding_dim: 64
