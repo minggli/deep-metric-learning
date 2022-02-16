@@ -31,5 +31,10 @@ if __name__ == "__main__":
     with open(f"gs://saved_models_minggli/model_{retrieval_model_id}.pt", "rb") as f:
         model = torch.load(f)
 
-    indexer_bytes_path = f"{indexer_prefix}_{retrieval_model_id}".encode()
+    indexer_bytes_path = str(PROJ_ROOT / f"{indexer_prefix}_{retrieval_model_id}").encode()
     indexer = initiate_indexer(indexer_bytes_path, embedding_dim)
+    fit_indexer(x_test, indexer, model)
+    indexer.save()
+    query = x_test[0].unsqueeze(0)
+    top_k_results = query_indexer(query, indexer, model)
+
