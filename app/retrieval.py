@@ -8,10 +8,9 @@ from torch.utils.data import DataLoader
 
 from app.datasets import ExperimentDatasets, load_dataset
 from app.ml_ops import test_single_batch
-from app.utils import get_project_root, get_torch_device
+from app.utils import get_project_root, get_torch_device, upload_folder
 from app.search import initiate_indexer, fit_indexer, query_indexer
 from app.objects import ImageTransform, TargetTransform
-
 
 if __name__ == "__main__":
     PROJ_ROOT = get_project_root()
@@ -29,12 +28,13 @@ if __name__ == "__main__":
     x_test, y_test = next(iter(test_batch_iter))
 
     with open(f"gs://saved_models_minggli/model_{retrieval_model_id}.pt", "rb") as f:
-        model = torch.load(f)
+        obj = torch.load(f, map_location=torch.device('cpu'))
+        model = getattr(obj, 'module', obj).to(x_test.device)
 
-    indexer_bytes_path = str(PROJ_ROOT / f"{indexer_prefix}_{retrieval_model_id}").encode()
-    indexer = initiate_indexer(indexer_bytes_path, embedding_dim)
+    indexer_path = str(PROJ_ROOT / f"{indexer_prefix}_{retrieval_model_id}")
+    indexer = initiate_indexer(indexer_path.encode(), embedding_dim)
     fit_indexer(x_test, indexer, model)
     indexer.save()
+    upload_folder(indexer_path)
     query = x_test[0].unsqueeze(0)
     top_k_results = query_indexer(query, indexer, model)
-
