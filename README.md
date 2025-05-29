@@ -20,8 +20,8 @@ Visualisation were produced using representation of last layer of untrained `Res
 |:------------:|:------------:|:------------:|
 |![alt text](assets/images_1644455093.gif "Fashion-MNIST, CrossEntropyLoss")|![alt text](assets/images_1644452471.gif "Fashion-MNIST, InfoNCE")|![alt text](assets/images_1644453434.gif "Fashion-MNIST, SoftNearestNeighbourLoss")|
 
-### Requirement
-`poetry install`
+### Run
+`uv run ./run.sh`
 
 ### Further Work
 - simple top-k Retrieval model
