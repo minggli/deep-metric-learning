@@ -2,7 +2,7 @@
 name = "deep-metric-learning"
 version = "0.1.0"
 readme = "README.md"
-requires-python = "3.9"
+requires-python = ">=3.9.0"
 authors = ["Ming Li <ming.george.li@gmail.com>"]
 license = "MIT"
 dependencies = [
